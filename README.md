@@ -67,11 +67,11 @@ exportlogPrefix/logGroupName/year=%d/month=%02d/day=%02d"
 ```aws
 {
   "regionBucketMap": {
-    "us-east-1": "s3://zzhe-iad-2",
-    "ap-southeast-1": "s3://zzhe-sin-1"
+    "us-east-1": "s3://my-bucket-us-east-1",
+    "ap-southeast-1": "s3://my-bucket-ap-southeast-1"
   },
   "exportDays": 1,
-  "snsTopicArn": "arn:aws:sns:ap-northeast-1:894855526703:cloudwatch-log-export-failures",
+  "snsTopicArn": "<arn of sns topic>",
   "exportlogPrefix": "cloudwatch-logs"
 }
 ```
