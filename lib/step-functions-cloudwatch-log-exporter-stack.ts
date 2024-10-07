@@ -65,9 +65,6 @@ export class StepFunctionsCloudwatchLogExporterStack extends cdk.Stack {
           user: 'root',
         },
       }),
-      environment: {
-        REGION_BUCKET_MAP: regionBucketMapParameter.valueAsString,
-      },
     });
 
     // Grant permissions to Lambda
