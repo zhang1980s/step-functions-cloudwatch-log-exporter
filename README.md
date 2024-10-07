@@ -1,14 +1,16 @@
 # 通过Step Functions和LAMBDA实现周期性归档cloudwatch log 到S3
 
 ---
-## 方案背景
+## 背景
 AWS Cloudwatch Log默认保存了多种AWS服务的日志信息，特别是托管服务的日志。默认情况下，Cloudwatch日志存储成本略高于标准对象存储的存储成本。
 
 下面价格对比以美东一为例：
 
-| Cloudwatch Log Data Stored | $0.03 per GB compressed (0.15 compression ratio for each uncompressed byte) |
-|:---------------------------|:---------------------------------------------------------------------------:|
-| S3 Standard |                     $0.021 per GB (Over 500 TB / Month)                     |
+
+| Option                        |                                    Price                                    |
+|:------------------------------|:---------------------------------------------------------------------------:|
+| Cloudwatch Log Data Stored    | $0.03 per GB compressed (0.15 compression ratio for each uncompressed byte) |
+| S3 Standard                   |                     $0.021 per GB (Over 500 TB / Month)                     |                              |                                                                             |
 | S3 Glacier Flexible Retrieval |                               $0.0036 per GB                                |
 
 多数情况下，一些不重要的日志可以通过Cloudwatch Log Retention Setting 定期清理历史日志。对于一些比较重要的日志，可以通过本方案进行对象存储归档。
@@ -21,7 +23,7 @@ Cloudwatch Log支持[ExportTask](https://docs.aws.amazon.com/AmazonCloudWatchLog
 
 本方案用于指定Cloudwatch log 定期归档的场景。
 
-## 方案架构
+## 应用架构
 
 ![架构图](picture/step-functions-cw-log-exporter-architecture.png)
 
@@ -33,6 +35,7 @@ Cloudwatch Log支持[ExportTask](https://docs.aws.amazon.com/AmazonCloudWatchLog
 
 ## 使用方式
 
+### 一次性执行
 通过向Step Functions的State machines传入指定参数启动execution。
 
 例如：
@@ -56,6 +59,24 @@ Cloudwatch Log支持[ExportTask](https://docs.aws.amazon.com/AmazonCloudWatchLog
 ```aws
 exportlogPrefix/logGroupName/year=%d/month=%02d/day=%02d"
 ```
+
+### 定时执行
+
+编辑CDK自动创建的EventBridge Rule， 在Additional settings中，选择Constant（JSON text)，然后指定下面内容：
+
+```aws
+{
+  "regionBucketMap": {
+    "us-east-1": "s3://zzhe-iad-2",
+    "ap-southeast-1": "s3://zzhe-sin-1"
+  },
+  "exportDays": 1,
+  "snsTopicArn": "arn:aws:sns:ap-northeast-1:894855526703:cloudwatch-log-export-failures",
+  "exportlogPrefix": "cloudwatch-logs"
+}
+```
+
+如果EventBridge Rule是每天执行，则设置exportDays=1； 如果EventBridge Rule是每周定期执行，则需要设置exportDays=7。
 
 ## 权限
 
