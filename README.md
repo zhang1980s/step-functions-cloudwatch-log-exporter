@@ -1,4 +1,4 @@
-# 通过Step Functions和LAMBDA实现周期性归档cloudwatch log 到S3
+# 通过Step Functions和Lambda实现周期性归档cloudwatch log 到S3的指定路径
 
 ---
 ## 背景
