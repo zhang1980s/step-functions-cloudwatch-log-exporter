@@ -76,6 +76,9 @@ exportlogPrefix/logGroupName/year=%d/month=%02d/day=%02d"
 }
 ```
 
+###
+某些log group如果不需要备份，则可以向指定log group添加 “auto-export=no”的tag，程序会SKIP这种类型的日志组。
+
 如果EventBridge Rule是每天执行，则设置exportDays=1； 如果EventBridge Rule是每周定期执行，则需要设置exportDays=7。
 
 ## 权限
