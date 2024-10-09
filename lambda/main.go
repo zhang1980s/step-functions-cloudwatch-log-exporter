@@ -50,6 +50,7 @@ type LogGroup struct {
 	TaskId            string    `json:"taskId,omitempty"`
 	StartTime         time.Time `json:"startTime,omitempty"`
 	EndTime           time.Time `json:"endTime,omitempty"`
+	NotificationArn   string    `json:"notificationArn"`
 }
 
 const (
@@ -183,6 +184,7 @@ func listLogGroups(ctx context.Context) ([]LogGroup, error) {
 					From:              from.Unix() * 1000,
 					To:                to.Unix() * 1000,
 					DestinationPrefix: destinationPrefix,
+					NotificationArn:   snsTopic,
 				})
 				logger.Infow("Added log group", "name", logGroupName, "status", taskStatus, "s3Destination", bucket, "destinationPrefix", destinationPrefix)
 			}
@@ -275,7 +277,7 @@ func notifyFailure(ctx context.Context, logGroup LogGroup) error {
 
 	input := &sns.PublishInput{
 		Message:  aws.String(message),
-		TopicArn: aws.String(snsTopic),
+		TopicArn: aws.String(logGroup.NotificationArn),
 	}
 
 	err := retryWithExponentialBackoff(func() error {
